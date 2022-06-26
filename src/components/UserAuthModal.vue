@@ -1,4 +1,5 @@
 <template>
+<!-- eslint-disable  -->
     <div class="fixed z-10 inset-0 overflow-y-auto" id="modal"
       :class="{ hidden: !authModalShow}">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center
@@ -78,45 +79,50 @@
             </button>
           </form>
           <!-- Registration Form -->
-          <form v-show="tab === 'register'">
+          <VeeForm v-show="tab === 'register'" :validation-schema="schema"
+          @submit="register" :initial-values="userData">
             <!-- Name -->
             <div class="mb-3">
               <label class="inline-block mb-2 w-full" for="name-input">
                 Name
-                <input type="text"
+                <VeeField type="text" name="name"
                   class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
                     duration-500 focus:outline-none focus:bg-cyan-200 focus:border-black rounded"
                   placeholder="Enter Name" id="name-input"/>
+                  <ErrorMessage class="text-red-600" name="name"/>
                 </label>
             </div>
             <!-- Email -->
             <div class="mb-3">
               <label class="inline-block mb-2 w-full" for="register-email">
                 Email
-                <input type="email"
+                <VeeField type="email" name="email"
                   class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
                     duration-500 focus:outline-none focus:bg-cyan-200 focus:border-black rounded"
                   placeholder="Enter Email" id="register-email"/>
+                  <ErrorMessage class="text-red-600" name="email"/>
               </label>
             </div>
             <!-- Age -->
             <div class="mb-3">
               <label class="inline-block mb-2 w-full" for="age-input">
                 Age
-                <input type="number"
+                <VeeField type="number" name="age"
                   class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
                    duration-500 focus:outline-none focus:bg-cyan-200 focus:border-black rounded"
                    id="age-input"/>
+                <ErrorMessage class="text-red-600" name="age"/>
               </label>
             </div>
             <!-- Password -->
             <div class="mb-3">
               <label class="inline-block mb-2 w-full" for="register-password">
                 Password
-                <input type="password"
+                <VeeField type="password" name="password"
                   class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
                     duration-500 focus:outline-none focus:bg-cyan-200 focus:border-black rounded"
                   placeholder="Password" id="register-password"/>
+                <ErrorMessage class="text-red-600" name="password"/>
               </label>
             </div>
             <!-- Confirm Password -->
@@ -124,39 +130,44 @@
               <label class="inline-block mb-2 w-full"
                 for="register-password-confirm">
                 Confirm Password
-                <input type="password"
+                <VeeField type="password" name="confirm_password"
                   class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
                     duration-500 focus:outline-none focus:bg-cyan-200 focus:border-black rounded"
                   placeholder="Confirm Password" id="register-password-confirm"/>
+                <ErrorMessage class="text-red-600" name="confirm_password"/>
               </label>
             </div>
             <!-- Country -->
             <div class="mb-3">
               <label class="inline-block mb-2 w-full" for="country-input">
                 Country
-                <select
+                <VeeField as="select" name="country"
                   class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition
                     duration-500 focus:outline-none focus:border-black rounded" id="country-input">
                   <option value="USA">USA</option>
-                  <option value="Mexico">Italy</option>
+                  <option value="Italy">Italy</option>
                   <option value="Germany">Germany</option>
-                </select>
+                  <option value="NotAllowed">NotAllowed</option>
+                  <option value="NotAllowed2">NotAllowed2</option>
+                </VeeField>
+                <ErrorMessage class="text-red-600" name="country"/>
               </label>
             </div>
             <!-- TOS -->
             <div class="mb-3 pl-6">
               <label class="inline-block w-full" for="terms-input">
-                <input type="checkbox" class="w-4 h-4 float-left -ml-6 mt-1 rounded"
-                id="terms-input"/>
+                <VeeField type="checkbox" name="tos" value="1"
+                  class="w-4 h-4 float-left -ml-6 mt-1 rounded" id="terms-input"/>
               Accept terms of service
               </label>
+              <ErrorMessage class="text-red-600" name="tos"/>
             </div>
             <button type="submit"
               class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition
                 hover:bg-purple-700">
               Submit
             </button>
-          </form>
+          </VeeForm>
         </div>
       </div>
     </div>
@@ -171,6 +182,18 @@ export default {
   data() {
     return {
       tab: 'login',
+      schema: {
+        name: 'required|min:3|max:100|alfa_spaces',
+        email: 'required|email',
+        age: 'required|min_value:18|max_value:100',
+        password: 'required|min:3|max:100',
+        confirm_password: 'password_missmatch:@password',
+        country: 'required|country_excluded:NotAllowed,NotAllowed2',
+        tos: 'tos',
+      },
+      userData: {
+        country: 'USA',
+      },
     };
   },
   computed: {
@@ -178,6 +201,9 @@ export default {
   },
   methods: {
     ...mapMutations(['toggleAuthModal']),
+    register(values) {
+      console.log(values);
+    },
   },
 
 };
